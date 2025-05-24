@@ -14,8 +14,6 @@ Can be tested out by opening command line and running:
 
 ## Hello world 
 
-In the example folder is a hello.vhd file containing a hello module to test out GHDL.
-
 Run the following commands to use GHDL on the hello.vhd file.
 
 Analysis of a design file in VHDL terms (hello.vhd)
