@@ -11,10 +11,12 @@ SRC_DIR="$SCRIPT_DIR/../src"
 TB_DIR="$SCRIPT_DIR/../tb"
 BUILD_DIR="$SCRIPT_DIR/../build"
 LOG_DIR="$BUILD_DIR/logs"
+WAVE_DIR="$BUILD_DIR/waves"
 
-# Create build & log directory
+# Create build, log and wave directory
 mkdir -p "$BUILD_DIR"
 mkdir -p "$LOG_DIR"
+mkdir -p "$WAVE_DIR"
 cd "$BUILD_DIR"
 
 # Analyze all source files
@@ -30,7 +32,8 @@ for tb_file in ../tb/tb_*.vhd; do
     ghdl -e "$tb_name"
 
     echo "Running testbench: $tb_name"
-    if ghdl -r "$tb_name"; then
+    wave_file="$WAVE_DIR/${tb_name}.ghw"
+    if ghdl -r "$tb_name" --wave="$wave_file"; then
         echo "Testbench $tb_name passed"
     else
         echo "Testbench $tb_name failed"

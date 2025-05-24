@@ -40,3 +40,19 @@ jobs:
       with:
         name: simulation-logs
         path: GHDL/build/logs/
+
+    - name: Check for waveforms
+      id: check_waveforms
+      run: |
+        if ls GHDL/build/waves/*.ghw 1> /dev/null 2>&1; then
+          echo "found=true" >> $GITHUB_OUTPUT
+        else
+          echo "found=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Upload waveforms
+      if: steps.check_waveforms.outputs.found == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: simulation-waveforms
+        path: GHDL/build/waves/
