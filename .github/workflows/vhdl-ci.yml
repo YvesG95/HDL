@@ -25,34 +25,11 @@ jobs:
         chmod +x run.sh
         ./run.sh
 
-    - name: Check for simulation logs
-      id: check_logs
-      run: |
-          if ls GHDL/build/logs/*.log 1> /dev/null 2>&1; then
-            echo "found=true" >> $GITHUB_OUTPUT
-          else
-            echo "found=false" >> $GITHUB_OUTPUT
-          fi
-
-    - name: Upload simulation logs
-      if: steps.check_logs.outputs.found == 'true'
+    - name: Upload simulation results (logs + waveforms)
+      if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: simulation-logs
-        path: GHDL/build/logs/
-
-    - name: Check for waveforms
-      id: check_waveforms
-      run: |
-        if ls GHDL/build/waves/*.ghw 1> /dev/null 2>&1; then
-          echo "found=true" >> $GITHUB_OUTPUT
-        else
-          echo "found=false" >> $GITHUB_OUTPUT
-        fi
-
-    - name: Upload waveforms
-      if: steps.check_waveforms.outputs.found == 'true'
-      uses: actions/upload-artifact@v4
-      with:
-        name: simulation-waveforms
-        path: GHDL/build/waves/
+        name: simulation-results
+        path: |
+          GHDL/build/logs
+          GHDL/build/waves
