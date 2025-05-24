@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# -----------------------------
+# GHDL VHDL Automation Script
+# -----------------------------
+set -e  # Exit on any error
+
+# Define variables
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SRC_DIR="$SCRIPT_DIR/../src"
+TB_DIR="$SCRIPT_DIR/../tb"
+BUILD_DIR="$SCRIPT_DIR/../build"
+LOG_DIR="$BUILD_DIR/logs"
+
+# Create build & log directory
+mkdir -p "$BUILD_DIR"
+mkdir -p "$LOG_DIR"
+cd "$BUILD_DIR"
+
+# Analyze all source files
+echo "Analyzing VHDL sources..."
+ghdl -a "$SRC_DIR"/*.vhd
+
+# Run all testbenches
+for tb_file in ../tb/tb_*.vhd; do
+    tb_name=$(basename "$tb_file" .vhd)
+
+    echo "Compiling  testbench: $tb_name"
+    ghdl -a "$tb_file"
+    ghdl -e "$tb_name"
+
+    echo "Running testbench: $tb_name"
+    if ghdl -r "$tb_name"; then
+        echo "Testbench $tb_name passed"
+    else
+        echo "Testbench $tb_name failed"
+    fi
+
+    # Handle the log file
+    src_log="${tb_name}_log.txt"
+    if [[ -f "$src_log" ]]; then
+        timestamp=$(date +%Y%m%d_%H%M%S)
+        mv "$src_log" "$LOG_DIR/${tb_name}_${timestamp}.log"
+    else
+        echo "Warning: Log file $src_log not found."
+    fi
+done
