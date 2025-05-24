@@ -21,12 +21,21 @@ jobs:
 
     - name: Run testbenches with GHDL
       run: |
-        cd project/scripts
-        chmod +x run_all.sh
-        ./run_all.sh
+        cd GHDL/sim
+        chmod +x run.sh
+        ./run.sh
+
+    - name: Check for simulation logs
+      id: check_logs
+      run: |
+          if ls project/build/logs/*.log 1> /dev/null 2>&1; then
+            echo "found=true" >> $GITHUB_OUTPUT
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+          fi
 
     - name: Upload simulation logs
-      if: always()
+      if: steps.check_logs.outputs.found == 'true'
       uses: actions/upload-artifact@v3
       with:
         name: simulation-logs
