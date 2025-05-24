@@ -1,0 +1,33 @@
+name: VHDL CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  ghdl-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install GHDL
+      run: |
+        sudo apt update
+        sudo apt install -y ghdl
+
+    - name: Run testbenches with GHDL
+      run: |
+        cd project/scripts
+        chmod +x run_all.sh
+        ./run_all.sh
+
+    - name: Upload simulation logs
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: simulation-logs
+        path: project/build/logs/
