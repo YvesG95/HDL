@@ -17,7 +17,7 @@ jobs:
     - name: Install GHDL
       run: |
         sudo apt update
-        sudo apt install -y ghdl
+        sudo apt install -y ghdl gtkwave xvfb
 
     - name: Run testbenches with GHDL
       run: |
