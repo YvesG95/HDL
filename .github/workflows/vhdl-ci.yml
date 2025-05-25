@@ -23,7 +23,7 @@ jobs:
       run: |
         cd GHDL/sim
         chmod +x run.sh
-        ./run.sh
+        ./run.sh --render
 
     - name: Upload simulation results (logs + waveforms)
       if: always()
