@@ -8,6 +8,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use std.textio.all;
+use work.tb_utils.all;
 
 entity tb_xor_gate is
 end entity;
@@ -18,6 +19,9 @@ architecture rtl of tb_xor_gate is
     signal a, b, c : std_logic := '0';
 
     file log_file : text open write_mode is "tb_xor_gate_log.txt";
+    
+    -- Constants
+    constant file_path : string := "tb/tb_xor_gate.vhd";
 
     -- Component
     component xor_gate is
@@ -27,30 +31,6 @@ architecture rtl of tb_xor_gate is
             c : out std_logic
         );
     end component;
-
-    -- Procedures
-    procedure log(message : in string) is
-        variable log_line : line;
-        variable time_ns  : integer;
-    begin
-        time_ns := integer(now / 1 ns);
-        write(log_line, "[" & integer'image(time_ns) & " ns] " & message);
-        writeline(log_file, log_line);
-    end procedure;
-
-    procedure check_result(
-        signal sig_a : std_logic; 
-        signal sig_b : std_logic;
-        signal sig_c : std_logic;
-        variable var_expected : std_logic; 
-        variable var_test_id  : integer
-    ) is
-    begin
-        if sig_c /= var_expected then
-            log("Test " & integer'image(var_test_id) & ": FAIL: A=" & std_logic'image(sig_a) & ", B=" & std_logic'image(sig_b) & ", expected C=" & std_logic'image(var_expected) & ", result C=" & std_logic'image(sig_c));
-            assert false report "Test " & integer'image(var_test_id) & ": XOR failed" severity error;
-        end if;
-    end procedure;
 
     -- Test inputs
     type test_array is array (natural range <>) of std_logic;
@@ -74,9 +54,9 @@ begin
         variable test_number     : integer   := 0;
         variable expected_output : std_logic := '0';
     begin
-        log("========= Starting Testbench =========");
+        log(log_file, "========= Starting Testbench =========", file_path);
         wait for 10 ns;
-        
+
         -- Going over all possible inputs
         for i in inputs_a'range loop
             test_number := i +1;
@@ -84,13 +64,13 @@ begin
             b <= inputs_b(i);
             expected_output := expected_c(i);
             wait for 10 ns;
-            check_result(a, b, c, expected_output, test_number);
+            assert_equal(c, expected_output, test_number, log_file, file_path);
         end loop;
             
         -- End of simulation
         a <= '0';
         b <= '0';
-        log("========= Testbench Completed =========");
+        log(log_file, "========= Testbench Completed =========", file_path);
         wait; 
     end process;
 
