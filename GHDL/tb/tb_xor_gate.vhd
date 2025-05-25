@@ -17,6 +17,8 @@ architecture rtl of tb_xor_gate is
     -- Signals
     signal a, b, c : std_logic := '0';
 
+    file log_file : text open write_mode is "tb_xor_gate_log.txt";
+
     -- Component
     component xor_gate is
         port (
@@ -26,9 +28,7 @@ architecture rtl of tb_xor_gate is
         );
     end component;
 
-    -- Logging
-    file log_file : text open write_mode is "tb_xor_gate_log.txt";
-
+    -- Procedures
     procedure log(message : in string) is
         variable log_line : line;
         variable time_ns  : integer;
@@ -37,6 +37,26 @@ architecture rtl of tb_xor_gate is
         write(log_line, "[" & integer'image(time_ns) & " ns] " & message);
         writeline(log_file, log_line);
     end procedure;
+
+    procedure check_result(
+        signal sig_a : std_logic; 
+        signal sig_b : std_logic;
+        signal sig_c : std_logic;
+        variable var_expected : std_logic; 
+        variable var_test_id  : integer
+    ) is
+    begin
+        if sig_c /= var_expected then
+            log("Test " & integer'image(var_test_id) & ": FAIL: A=" & std_logic'image(sig_a) & ", B=" & std_logic'image(sig_b) & ", expected C=" & std_logic'image(var_expected) & ", result C=" & std_logic'image(sig_c));
+            assert false report "Test " & integer'image(var_test_id) & ": XOR failed" severity error;
+        end if;
+    end procedure;
+
+    -- Test inputs
+    type test_array is array (natural range <>) of std_logic;
+    constant inputs_a   : test_array := ('0', '0', '1', '1');
+    constant inputs_b   : test_array := ('0', '1', '0', '1');
+    constant expected_c : test_array := ('0', '1', '1', '0');
 
 begin
 
@@ -50,70 +70,27 @@ begin
         );
 
     -- Test procedure
-    process
-        variable all_passed      : boolean   := TRUE;
+    test_procedure : process
         variable test_number     : integer   := 0;
         variable expected_output : std_logic := '0';
     begin
-        -- Test 00 (0)
-        test_number := test_number + 1;
-        a <= '0';
-        b <= '0';
-        expected_output := '0';
+        log("========= Starting Testbench =========");
         wait for 10 ns;
-
-        if c /= expected_output then
-            log("Test " & integer'image(test_number) & ": FAIL: A=" & std_logic'image(a) & ", B=" & std_logic'image(b) & ", expected C=" & std_logic'image(expected_output) & ", result C=" & std_logic'image(c));
-            all_passed := FALSE;
-        end if;
         
-        -- Test 01 (1)
-        test_number := test_number + 1;
-        a <= '0';
-        b <= '1';
-        expected_output := '1';
-        wait for 10 ns;
-
-        if c /= expected_output then
-            log("Test " & integer'image(test_number) & ": FAIL: A=" & std_logic'image(a) & ", B=" & std_logic'image(b) & ", expected C=" & std_logic'image(expected_output) & ", result C=" & std_logic'image(c));
-            all_passed := FALSE;
-        end if;
-
-        -- Test 10 (1)
-        test_number := test_number + 1;
-        a <= '1';
-        b <= '0';
-        expected_output := '1';
-        wait for 10 ns;
-
-        if c /= expected_output then
-            log("Test " & integer'image(test_number) & ": FAIL: A=" & std_logic'image(a) & ", B=" & std_logic'image(b) & ", expected C=" & std_logic'image(expected_output) & ", result C=" & std_logic'image(c));
-            all_passed := FALSE;
-        end if;
-
-        -- Test 11 (0)
-        test_number := test_number + 1;
-        a <= '1';
-        b <= '1';
-        expected_output := '0';
-        wait for 10 ns;
-
-        if c /= expected_output then
-            log("Test " & integer'image(test_number) & ": FAIL: A=" & std_logic'image(a) & ", B=" & std_logic'image(b) & ", expected C=" & std_logic'image(expected_output) & ", result C=" & std_logic'image(c));
-            all_passed := FALSE;
-        end if;
-
-        if all_passed then
-            log("All tests passed.");
-        else
-            log("One or more tests failed.");
-            assert false report "One or more tests failed, see log." severity error; -- GHDL return a non-zero exit code
-        end if;
-
+        -- Going over all possible inputs
+        for i in inputs_a'range loop
+            test_number := i +1;
+            a <= inputs_a(i);
+            b <= inputs_b(i);
+            expected_output := expected_c(i);
+            wait for 10 ns;
+            check_result(a, b, c, expected_output, test_number);
+        end loop;
+            
         -- End of simulation
         a <= '0';
         b <= '0';
-        log("Testbench completed.");
+        log("========= Testbench Completed =========");
         wait; 
     end process;
 
