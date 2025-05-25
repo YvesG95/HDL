@@ -63,10 +63,10 @@ for tb_file in ../tb/tb_*.vhd; do
         echo "Warning: Log file $src_log not found."
     fi
 
-    # Generate waveform previes
+    # Generate waveform preview
     if $RENDER && [[ -f "$wave_file" ]] && $IS_LINUX; then
         echo "Generating waveform preview..."
         png_file="$WAVE_DIR/${tb_name}.png"
-        xvfb-run gtkwave -T -o "$png_file" "$wave_file"
+        xvfb-run gtkwave --script="$SCRIPT_DIR/render.tcl" "$wave_file" "$png_file"
     fi
 done

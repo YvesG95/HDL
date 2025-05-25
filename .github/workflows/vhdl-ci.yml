@@ -32,4 +32,5 @@ jobs:
         name: simulation-results
         path: |
           GHDL/build/logs
-          GHDL/build/waves
+          GHDL/build/waves/*.ghw
+          GHDL/build/waves/*.png
