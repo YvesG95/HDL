@@ -14,10 +14,19 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Install GHDL
+    - name: Installs
       run: |
         sudo apt update
         sudo apt install -y ghdl gtkwave xvfb
+
+    - name: Show GTKWave help
+      run: |
+        echo "GTKWave version:"
+        gtkwave --version || echo "gtkwave --version failed"
+      
+        echo "GTKWave --help output:"
+        gtkwave --help || echo "gtkwave --help failed"
+      
 
     - name: Run testbenches with GHDL
       run: |
