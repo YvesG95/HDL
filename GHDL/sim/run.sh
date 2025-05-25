@@ -68,7 +68,8 @@ for tb_file in ../tb/tb_*.vhd; do
     if $IS_LINUX && $RENDER && [[ -f "$wave_file" ]] && [[ -f "$gtkw_file" ]]; then
         echo "Generating waveform preview..."
         png_file="$WAVE_DIR/${tb_name}.png"
-        if ! xvfb-run gtkwave -o "$png_file" -T "$gtkw_file" "$wave_file"; then
+        cp "$gtkw_file" "$BUILD_DIR/tmp.gtkw"
+        if ! xvfb-run gtkwave "$wave_file" "$BUILD_DIR/tmp.gtkw" --script="$SCRIPT_DIR/render.tcl" "$wave_file" "$png_file"; then
             echo "Error: GTKWave failed to render $tb_name"
         fi
     fi
