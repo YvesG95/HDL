@@ -19,20 +19,11 @@ jobs:
         sudo apt update
         sudo apt install -y ghdl gtkwave xvfb
 
-    - name: Show GTKWave help
-      run: |
-        echo "GTKWave version:"
-        gtkwave --version || echo "gtkwave --version failed"
-      
-        echo "GTKWave --help output:"
-        gtkwave --help || echo "gtkwave --help failed"
-      
-
     - name: Run testbenches with GHDL
       run: |
         cd GHDL/sim
         chmod +x run.sh
-        ./run.sh --render
+        ./run.sh
 
     - name: Upload simulation results (logs + waveforms)
       if: always()

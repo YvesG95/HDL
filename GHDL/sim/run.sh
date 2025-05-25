@@ -19,15 +19,6 @@ BUILD_DIR="$SCRIPT_DIR/../build"
 LOG_DIR="$BUILD_DIR/logs"
 WAVE_DIR="$BUILD_DIR/waves"
 
-# Checking for --render in arguments
-RENDER=false
-for arg in "$@"; do
-    if [[ "$arg" == "--render" ]]; then
-        RENDER=true
-        break;
-    fi
-done
-
 # Create build, log and wave directory
 mkdir -p "$BUILD_DIR"
 mkdir -p "$LOG_DIR"
@@ -61,16 +52,5 @@ for tb_file in ../tb/tb_*.vhd; do
         mv "$src_log" "$LOG_DIR/${tb_name}_${timestamp}.log"
     else
         echo "Warning: Log file $src_log not found."
-    fi
-
-    # Generate waveform preview
-    gtkw_file="$TB_DIR/${tb_name}.gtkw"
-    if $IS_LINUX && $RENDER && [[ -f "$wave_file" ]] && [[ -f "$gtkw_file" ]]; then
-        echo "Generating waveform preview..."
-        png_file="$WAVE_DIR/${tb_name}.png"
-        cp "$gtkw_file" "$BUILD_DIR/tmp.gtkw"
-        if ! xvfb-run gtkwave "$wave_file" "$BUILD_DIR/tmp.gtkw" --script="$SCRIPT_DIR/render.tcl" "$wave_file" "$png_file"; then
-            echo "Error: GTKWave failed to render $tb_name"
-        fi
     fi
 done
