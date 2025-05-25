@@ -64,10 +64,12 @@ for tb_file in ../tb/tb_*.vhd; do
     fi
 
     # Generate waveform preview
-    if $RENDER && [[ -f "$wave_file" ]] && $IS_LINUX; then
+    gtkw_file="$TB_DIR/${tb_name}.gtkw"
+    if $IS_LINUX && $RENDER && [[ -f "$wave_file" ]] && [[ -f "$gtkw_file" ]]; then
         echo "Generating waveform preview..."
-        gtkw_file="$TB_DIR/${tb_name}.gtkw"
         png_file="$WAVE_DIR/${tb_name}.png"
-        xvfb-run gtkwave "$wave_file" "$gtkw_file" --script "$SCRIPT_DIR/render.tcl" "$png_file"
+        if ! xvfb-run gtkwave -o "$png_file" -T "$gtkw_file" "$wave_file"; then
+            echo "Error: GTKWave failed to render $tb_name"
+        fi
     fi
 done
