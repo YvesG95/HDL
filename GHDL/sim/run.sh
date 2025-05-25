@@ -66,7 +66,8 @@ for tb_file in ../tb/tb_*.vhd; do
     # Generate waveform preview
     if $RENDER && [[ -f "$wave_file" ]] && $IS_LINUX; then
         echo "Generating waveform preview..."
+        gtkw_file="$TB_DIR/${tb_name}.gtkw"
         png_file="$WAVE_DIR/${tb_name}.png"
-        xvfb-run gtkwave --script="$SCRIPT_DIR/render.tcl" "$wave_file" "$png_file"
+        xvfb-run gtkwave -o "$png_file" -T "$gtkw_file" "$wave_file"
     fi
 done
