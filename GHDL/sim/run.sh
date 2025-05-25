@@ -42,28 +42,28 @@ for tb_file in ../tb/tb_*.vhd; do
         echo "===== Starting $tb_name ====="
     fi
 
-    echo "Compiling: Testbench $tb_name"
+    echo "Compiling: $tb_name"
     if ! ghdl -a "$tb_file" || ! ghdl -e "$tb_name"; then
         ((fail_count++))
         echo "::error::Failed to compile $tb_name"
         continue
     fi
 
-    echo "Running: Testbench $tb_name"
+    echo "Running: $tb_name"
     wave_file="$WAVE_DIR/${tb_name}.ghw"
     if ghdl -r "$tb_name" --wave="$wave_file"; then
         ((pass_count++))
         if [[ "$GITHUB_ACTIONS" == "true" ]]; then
-            echo "::notice::Testbench $tb_name passed"
+            echo "::notice::$tb_name passed"
         else
-            echo "Testbench $tb_name passed"
+            echo "$tb_name passed"
         fi
     else
         ((fail_count++))
         if [[ "$GITHUB_ACTIONS" == "true" ]]; then
-            echo "::error::Testbench $tb_name failed"
+            echo "::error::$tb_name failed"
         else
-            echo "Testbench $tb_name failed"
+            echo "$tb_name failed"
         fi
     fi
 
