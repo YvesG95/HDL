@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Detect if the script is running on Linux system
+IS_LINUX=false
+if [[ "$(uname -s)" == "Linux" ]]; then
+    IS_LINUX=true
+fi
+
 # -----------------------------
 # GHDL VHDL Automation Script
 # -----------------------------
@@ -12,6 +18,15 @@ TB_DIR="$SCRIPT_DIR/../tb"
 BUILD_DIR="$SCRIPT_DIR/../build"
 LOG_DIR="$BUILD_DIR/logs"
 WAVE_DIR="$BUILD_DIR/waves"
+
+# Checking for --render in arguments
+RENDER=false
+for arg in "$@"; do
+    if [[ "$arg" == "--render" ]]; then
+        RENDER=true
+        break;
+    fi
+done
 
 # Create build, log and wave directory
 mkdir -p "$BUILD_DIR"
@@ -46,5 +61,12 @@ for tb_file in ../tb/tb_*.vhd; do
         mv "$src_log" "$LOG_DIR/${tb_name}_${timestamp}.log"
     else
         echo "Warning: Log file $src_log not found."
+    fi
+
+    # Generate waveform previes
+    if $RENDER && [[ -f "$wave_file" ]] && $IS_LINUX; then
+        echo "Generating waveform preview..."
+        png_file="$WAVE_DIR/${tb_name}.png"
+        xvfb-run gtkwave -T -o "$png_file" "$wave_file"
     fi
 done
