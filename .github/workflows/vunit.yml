@@ -1,0 +1,45 @@
+name: VUnit Test
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'VUnit/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'VUnit/**'
+
+jobs:
+  test:
+    name: Run VUnit tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install VUnit
+        run: |
+          python -m pip install --upgrade pip
+          pip install vunit_hdl junit2html
+
+      - name: Run VUnit tests
+        run: python VUnit/run.py
+
+      - name: Upload test reports (XML + HTML)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vunit-reports
+          path: |
+            VUnit/vunit_out/reports/*.xml
+            VUnit/vunit_out/reports/*.html
+

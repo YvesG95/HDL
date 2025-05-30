@@ -1,4 +1,15 @@
+import sys
+import subprocess
+from pathlib import Path
 from vunit import VUnit
+
+# Ensure report directory exists
+report_path = Path("vunit_out/reports")
+report_path.mkdir(parents=True, exist_ok=True)
+
+# Add xunit-xml argument if not already present
+if not any(arg.startswith("--xunit-xml") for arg in sys.argv):
+    sys.argv += ["--xunit-xml", str(report_path / "vunit_report.xml")]
 
 # Create VUnit instance by parsing command line arguments
 vu = VUnit.from_argv()

@@ -2,12 +2,19 @@ name: VHDL CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+    paths:
+      - 'GHDL/**'
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
+    paths:
+      - 'GHDL/**'
 
 jobs:
   ghdl-test:
+    name: Run GHDL tests
     runs-on: ubuntu-latest
 
     steps:
