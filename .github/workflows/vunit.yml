@@ -39,10 +39,6 @@ jobs:
         working-directory: VUnit
         run: python run.py
 
-      - name: Convert XML report to HTML
-        working-directory: VUnit
-        run: python convert_report.py
-
       - name: Upload test reports (XML + HTML)
         if: always()
         uses: actions/upload-artifact@v4
@@ -52,3 +48,15 @@ jobs:
             VUnit/vunit_out/reports/*.xml
             VUnit/vunit_out/reports/*.html
 
+      - name: Add summary to GitHub Actions
+        if: always()
+        run: |
+            echo "## VUnit CI Summary" >> $GITHUB_STEP_SUMMARY
+            if [ -f VUnit/vunit_out/reports/junit_report.xml ]; then
+            passed=$(grep -o 'testsuite tests="[^"]*"' VUnit/vunit_out/reports/junit_report.xml | sed -E 's/.*tests="([0-9]+)".*/\1/')
+            failures=$(grep -o 'failures="[^"]*"' VUnit/vunit_out/reports/junit_report.xml | sed -E 's/.*failures="([0-9]+)".*/\1/')
+            echo "- Total tests: $passed" >> $GITHUB_STEP_SUMMARY
+            echo "- Failures: $failures" >> $GITHUB_STEP_SUMMARY
+            else
+            echo "- No test report found." >> $GITHUB_STEP_SUMMARY
+            fi
