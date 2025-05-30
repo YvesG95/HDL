@@ -1,3 +1,4 @@
+import os
 import sys
 import subprocess
 import xml.etree.ElementTree as ET
@@ -48,15 +49,36 @@ else:
     print(f"junit2html failed with exit code {result.returncode}")
 
 # Parse report and emit GitHub Annotations
+summary_lines = ["## VUnit CI Summary\n"]
 if xml_path.exists():
     tree = ET.parse(xml_path)
     root = tree.getroot()
+    total = 0
+    failures = 0
     for testcase in root.iter("testcase"):
+        total += 1
         if testcase.find("failure") is not None:
+            failures += 1
             name = testcase.get("name")
             classname = testcase.get("classname")
             full_name = f"{classname}.{name}" if classname else name
-            print(f"::error title=Test Failure::Test '{full_name}' failed")
+            summary_lines.append(f"- **{full_name}** failed")
+        else:
+            name = testcase.get("name")
+            classname = testcase.get("classname")
+            full_name = f"{classname}.{name}" if classname else name
+            summary_lines.append(f"- **{full_name}** passed")
+    summary_lines.append(f"\n**Result**: {total - failures}/{total} tests passed.")
+
+    # Write the summary to Github Actions
+    summary_env = os.getenv("GITHUB_STEP_SUMMARY")
+    if summary_env:
+        summary_path = Path(summary_env)
+        summary_path.write_text("\n".join(summary_lines), encoding="utf-8")
+    else:
+        print("::warning::GITHUB_STEP_SUMMARY is not set, skipping summary output.")
+else:
+    print("::warning::No test report found to generate summary.")
 
 # Exit with the earlier given code
 sys.exit(exit_code)
