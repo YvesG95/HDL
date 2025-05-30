@@ -39,12 +39,16 @@ jobs:
         working-directory: VUnit
         run: python run.py
 
+      - name: Convert XML report to HTML
+        working-directory: VUnit
+        run: python convert_report.py
+
       - name: Upload test reports (XML + HTML)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: vunit-reports
           path: |
-            vunit_out/reports/*.xml
-            vunit_out/reports/*.html
+            VUnit/vunit_out/reports/*.xml
+            VUnit/vunit_out/reports/*.html
 

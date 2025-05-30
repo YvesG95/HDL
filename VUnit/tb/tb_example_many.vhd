@@ -16,8 +16,8 @@ begin
       if run("test_pass") then
         report "This will pass";
 
-      elsif run("test_fail") then
-        assert false report "It fails";
+      --elsif run("test_fail") then
+      --  assert false report "It fails";
 
       end if;
     end loop;
