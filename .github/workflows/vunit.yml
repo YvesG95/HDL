@@ -27,10 +27,13 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install VUnit
+      - name: Install dependencies
         run: |
+          sudo apt update
+          sudo apt install -y ghdl
           python -m pip install --upgrade pip
-          pip install vunit_hdl junit2html
+          pip install --pre vunit_hdl
+          pip install junit2html
 
       - name: Run VUnit tests
         working-directory: VUnit
