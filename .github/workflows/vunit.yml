@@ -32,7 +32,9 @@ jobs:
           pip install vunit_hdl junit2html
 
       - name: Run VUnit tests
-        run: python VUnit/run.py
+        run: |
+          cd VUnit
+          python run.py
 
       - name: Upload test reports (XML + HTML)
         if: always()
