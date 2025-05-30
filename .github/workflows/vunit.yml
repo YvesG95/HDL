@@ -32,9 +32,8 @@ jobs:
           pip install vunit_hdl junit2html
 
       - name: Run VUnit tests
-        run: |
-          cd VUnit
-          python run.py
+        working-directory: VUnit
+        run: python run.py
 
       - name: Upload test reports (XML + HTML)
         if: always()
@@ -42,6 +41,6 @@ jobs:
         with:
           name: vunit-reports
           path: |
-            VUnit/vunit_out/reports/*.xml
-            VUnit/vunit_out/reports/*.html
+            vunit_out/reports/*.xml
+            vunit_out/reports/*.html
 
