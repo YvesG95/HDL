@@ -11,6 +11,7 @@ on:
       - main
     paths:
       - 'GHDL/**'
+  workflow_dispatch:
 
 jobs:
   ghdl-test:

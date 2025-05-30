@@ -11,7 +11,8 @@ on:
       - main
     paths:
       - 'VUnit/**'
-
+  workflow_dispatch:
+      
 jobs:
   test:
     name: Run VUnit tests
