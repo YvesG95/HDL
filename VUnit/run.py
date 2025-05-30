@@ -28,7 +28,8 @@ lib = vu.add_library("lib")
 lib.add_source_files("tb/*.vhd")
 
 # Run vunit function and get the test report
-exit_code = vu._main(post_run=lambda **kwargs: None)
+tests_passed = vu._main(post_run=lambda **kwargs: None)
+exit_code = 0 if tests_passed else 1
 
 # Convert XML report to HTML
 xml_path = report_path / "vunit_report.xml"
