@@ -5,13 +5,15 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from vunit import VUnit
 
-# Ensure report directory exists
-report_path = Path("vunit_out/reports")
-report_path.mkdir(parents=True, exist_ok=True)
+# Ensure report & wave output directories exists
+report_dir = Path("vunit_out/reports")
+wave_dir = Path("vunit_out/waves")
+report_dir.mkdir(parents=True, exist_ok=True)
+wave_dir.mkdir(parents=True, exist_ok=True)
 
 # Add xunit-xml argument if not already present
 if not any(arg.startswith("--xunit-xml") for arg in sys.argv):
-    sys.argv += ["--xunit-xml", str(report_path / "vunit_report.xml")]
+    sys.argv += ["--xunit-xml", str(report_dir / "vunit_report.xml")]
 
 # Create VUnit instance by parsing command line arguments
 vu = VUnit.from_argv()
@@ -25,16 +27,26 @@ vu.add_vhdl_builtins()
 # Create library 'lib'
 lib = vu.add_library("lib")
 
-# Add all files ending in .vhd in current working directory to library
+# Add all files ending in .vhd in source & testbench directory to library
+lib.add_source_files("src/*.vhd")
 lib.add_source_files("tb/*.vhd")
+
+# Loop over all test benches and add a config with the correct waveform path
+for tb in lib.get_test_benches():
+    wave_path = os.path.abspath(os.path.join(wave_dir, f"{tb.name}.ghw"))
+
+    tb.add_config(
+        name="with_wave",
+        sim_options={"ghdl.sim_flags": [f"--wave={os.path.abspath(wave_path)}"]}
+    )
 
 # Run vunit function and get the test report
 tests_passed = vu._main(post_run=lambda **kwargs: None)
 exit_code = 0 if tests_passed else 1
 
 # Convert XML report to HTML
-xml_path = report_path / "vunit_report.xml"
-html_path = report_path / "vunit_report.html"
+xml_path = report_dir / "vunit_report.xml"
+html_path = report_dir / "vunit_report.html"
 
 result = subprocess.run([
     "junit2html", 

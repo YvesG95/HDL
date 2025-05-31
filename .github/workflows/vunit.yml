@@ -39,7 +39,7 @@ jobs:
         working-directory: VUnit
         run: python run.py
 
-      - name: Upload test reports (XML + HTML)
+      - name: Upload test reports (XML, HTML + GHW)
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -47,3 +47,4 @@ jobs:
           path: |
             VUnit/vunit_out/reports/*.xml
             VUnit/vunit_out/reports/*.html
+            VUnit/vunit_out/waves/*.ghw
