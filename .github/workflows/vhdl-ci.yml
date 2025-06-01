@@ -22,10 +22,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Installs
-      run: |
-        sudo apt update
-        sudo apt install -y ghdl gtkwave xvfb
+    - name: Set up GHDL
+      uses: ghdl/setup-ghdl@v1
+      with:
+        backend: llvm
 
     - name: Run testbenches with GHDL
       run: |
