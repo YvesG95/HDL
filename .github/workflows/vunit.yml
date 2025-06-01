@@ -27,13 +27,15 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      - name: Set up GHDL
+        uses: ghdl/setup-ghdl@v1
+        with:
+          backend: llvm
+
+      - name: Install Python dependencies
         run: |
-          sudo apt update
-          sudo apt install -y ghdl
           python -m pip install --upgrade pip
-          pip install --pre vunit_hdl
-          pip install junit2html
+          pip install --pre vunit_hdl junit2html
 
       - name: Run VUnit tests
         working-directory: VUnit
